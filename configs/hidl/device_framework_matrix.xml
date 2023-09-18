@@ -4,7 +4,7 @@
      SPDX-License-Identifier: BSD-3-Clause
 -->
 <compatibility-matrix version="2.0" type="framework">
-    <hal format="hidl" optional="true">
+<hal format="hidl" optional="true">
         <name>android.hardware.biometrics.fingerprint</name>
         <version>2.0-3</version>
         <interface>
@@ -156,7 +156,6 @@
     </hal>
     <hal format="hidl" optional="true">
         <name>vendor.display.config</name>
-        <version>1.5-11</version>
         <version>2.0</version>
         <interface>
             <name>IDisplayConfig</name>
@@ -523,7 +522,7 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <hal format="hidl" optional="true">
+        <hal format="hidl" optional="true">
         <name>vendor.xiaomi.hardware.mlipay</name>
         <version>1.0-1</version>
         <interface>
@@ -531,7 +530,7 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <hal format="hidl" optional="true">
+        <hal format="hidl" optional="true">
         <name>vendor.xiaomi.hardware.motor</name>
         <version>1.0</version>
         <interface>

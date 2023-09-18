@@ -10,9 +10,6 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 # Setup dalvik vm configs
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 
-# Firmware
-$(call inherit-product, vendor/xiaomi-firmware/psyche/firmware.mk)
-
 # Boot animation
 TARGET_SCREEN_HEIGHT := 2400
 TARGET_SCREEN_WIDTH := 1080
@@ -101,6 +98,18 @@ PRODUCT_PACKAGES += \
     checkpoint_gc \
     otapreopt_script
 
+# AAPT
+PRODUCT_AAPT_CONFIG := normal
+PRODUCT_AAPT_PREF_CONFIG := xxhdpi
+# AID/fs configs
+PRODUCT_PACKAGES += \
+    fs_config_files
+# Speed profile services and wifi-service to reduce RAM and storage
+PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
+# ANT+
+PRODUCT_PACKAGES += \
+    com.dsi.ant@1.0.vendor
+
 # ART Debugging (Disable)
 USE_DEX2OAT_DEBUG := false
 PRODUCT_MINIMIZE_JAVA_DEBUG_INFO := true
@@ -108,7 +117,6 @@ PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
 
 # Audio
 PRODUCT_PACKAGES += \
-    audioadsprpcd \
     android.hardware.audio@6.0-impl \
     android.hardware.audio.effect@6.0-impl \
     android.hardware.audio.service \
@@ -124,7 +132,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     liba2dpoffload \
     libaudiopreprocessing \
-    libaudio-resampler \
     libbatterylistener \
     libbundlewrapper \
     libcomprcapture \
@@ -151,19 +158,15 @@ PRODUCT_PACKAGES += \
    libalsautils \
    libalsautilsv2
 
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.audio.ring.filter.mask=0 \
-    ro.config.media_vol_steps=12 \
-    ro.config.vc_call_vol_steps=11 \
-    ro.vendor.audio.enhance.support=false \
-    ro.vendor.audio.ns.support=false \
-    ro.vendor.audio.support.sound.id=true \
-    ro.vendor.audio.us.type=mius \
-    ro.vendor.audio.zoom.support=true \
-    ro.vendor.audio.zoom.type=1
-
-PRODUCT_ODM_PROPERTIES += \
-    aaudio.mmap_policy=1
+# Audio Debugging Packages
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+PRODUCT_PACKAGES += \
+    tinyplay \
+    tinycap \
+    tinymix \
+    tinypcminfo \
+    cplay
+endif
     
 # Audio configs
 PRODUCT_COPY_FILES += \
@@ -181,26 +184,13 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.btconfigstore@1.0.vendor \
     vendor.qti.hardware.btconfigstore@2.0.vendor
 
-# Bluetooth Library Deps
-PRODUCT_PACKAGES += \
-    libbluetooth_audio_session \
-    libbthost_if.vendor \
-    libldacBT_bco \
-    libldacBT_bco.vendor \
-    liblhdc \
-    liblhdcBT_enc \
-    liblhdcdec \
-    liblhdcBT_dec
-
 # Camera
-PRODUCT_PACKAGES += \
-    libMegviiFacepp-0.5.2 \
-    libmegface \
-    libpiex_shim
-
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl \
     android.hardware.camera.provider@2.4-service_64
+	
+PRODUCT_PACKAGES += \
+    libpiex_shim
 
 PRODUCT_PACKAGES += \
     libcamera2ndk_vendor \
@@ -232,48 +222,6 @@ PRODUCT_DEX_PREOPT_DEFAULT_COMPILER_FILTER := verify
 # Device-specific settings
 PRODUCT_PACKAGES += \
     XiaomiParts
-
-ifeq ($(TARGET_USES_MIUI_DOLBY),true)
-# Miui Dolby Engine Topic
-# Dolby Sepolicy
-BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/dolby
-# Dolby Props
-PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.dolby.dax.version=DAX3_3.6.1.6_r1 \
-    ro.vendor.audio.dolby.dax.version=DAX3_3.6 \
-    ro.vendor.audio.dolby.dax.support=true \
-    ro.vendor.audio.dolby.surround.enable=true
-
-# Dolby Permissions
-PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/dolby/permissions,$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions)
-
-# MiSound with Dolby Environment (By Default - Disabled)
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.audio.misound.disable=true \
-    ro.vendor.audio.misound.bluetooth.enable=true
-
-# Dolby MediaCodecs Loading Support (Overwrites Vendor files)
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/dolby/media/media_codecs_kona_vendor.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_kona_vendor.xml \
-    $(LOCAL_PATH)/dolby/media/media_codecs_dolby_audio.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_dolby_audio.xml
-
-# Dolby Config File
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/dolby/config/dax-default.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml
-
-# Remove Packages for Dolby Support
-PRODUCT_PACKAGES += \
-    RemovePackagesDolby
-
-else
-# MiSound (Dirac Only)
-# MiSound without Dolby (By Default - Enabled)
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.audio.misound.disable=false \
-    ro.vendor.audio.misound.bluetooth.enable=true
-endif
-
 
 # Display
 PRODUCT_PACKAGES += \
@@ -320,7 +268,16 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_VENDOR_PROPERTIES += \
     ro.vendor.display.paneltype=2 \
-    ro.vendor.display.sensortype=2
+    ro.vendor.display.sensortype=2 \
+    vendor.display.qdcm.mode_combine=1 \
+    vendor.display.use_layer_ext=1 \
+    vendor.display.defer_fps_frame_count=2
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    ro.surface_flinger.set_idle_timer_ms=4000 \
+    ro.surface_flinger.set_touch_timer_ms=4000 \
+    ro.surface_flinger.set_display_power_timer_ms=1000 \
+    ro.surface_flinger.use_content_detection_for_refresh_rate=true
 
 # DRM
 PRODUCT_PACKAGES += \
@@ -328,10 +285,6 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     android.hardware.drm@1.4.vendor
-
-# QTI
-TARGET_COMMON_QTI_COMPONENTS := \
-    qseecomd
 
 # fastbootd
 PRODUCT_PACKAGES += \
@@ -368,10 +321,6 @@ PRODUCT_PACKAGES += \
     android.hardware.gnss@1.1.vendor \
     android.hardware.gnss@2.1.vendor
 
-# GPS Configs
-PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/gps/,$(TARGET_COPY_OUT_VENDOR)/etc)
-
 # Health
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
@@ -390,8 +339,7 @@ PRODUCT_PACKAGES += \
 
 # HotwordEnrollement app permissions
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/hotword-hiddenapi-package-whitelist.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/sysconfig/hotword-hiddenapi-package-whitelist.xml \
-    $(LOCAL_PATH)/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
+    $(LOCAL_PATH)/configs/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
 
 # IFAAService
 PRODUCT_PACKAGES += \
@@ -400,9 +348,11 @@ PRODUCT_PACKAGES += \
 # IPACM
 PRODUCT_PACKAGES += \
     ipacm \
-    IPACM_cfg.xml \
-    libipanat \
-    liboffloadhal
+    IPACM_cfg.xml
+
+# IRSC
+PRODUCT_PACKAGES += \
+    sec_config
 
 # Kernel
 PRODUCT_SET_DEBUGFS_RESTRICTIONS := true
@@ -423,8 +373,6 @@ PRODUCT_PACKAGES += \
 
 # Media C2 Vendor
 PRODUCT_PACKAGES += \
-    libcodec2_vndk.vendor \
-    android.hardware.media.c2@1.0.vendor \
     libcodec2_hidl@1.0.vendor \
     libcodec2_soft_common.vendor \
     libstagefright_softomx.vendor
@@ -438,27 +386,6 @@ PRODUCT_COPY_FILES += \
     frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_video.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_video_le.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_google_video_le.xml
 
-# Media C2
-PRODUCT_PACKAGES += \
-    libcodec2_vndk.vendor \
-    android.hardware.media.c2@1.0.vendor \
-    libcodec2_hidl@1.0.vendor
-
-# C2 codecs
-PRODUCT_PACKAGES += \
-    libcodec2_soft_avcdec \
-    libcodec2_soft_avcenc \
-    libcodec2_soft_h263dec \
-    libcodec2_soft_h263enc \
-    libcodec2_soft_mpeg4dec \
-    libcodec2_soft_mpeg4enc \
-    libcodec2_soft_vp8dec \
-    libcodec2_soft_vp8enc \
-    libcodec2_soft_vp9dec \
-    libcodec2_soft_vp9enc \
-    libcodec2_soft_hevcdec \
-    libcodec2_soft_hevcenc
-
 # Media Configs
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/media/,$(TARGET_COPY_OUT_VENDOR)/etc)
@@ -466,9 +393,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     vendor.xiaomi.hardware.mlipay@1.1.vendor \
     vendor.xiaomi.hardware.mtdservice@1.2.vendor
-# Inherit several Android Go Configurations(Beneficial for everyone, even on non-Go devices)
-PRODUCT_USE_PROFILE_FOR_BOOT_IMAGE := true
-PRODUCT_DEX_PREOPT_BOOT_IMAGE_PROFILE_LOCATION := frameworks/base/config/boot-image-profile.txt
 
 # Net
 PRODUCT_PACKAGES += \
@@ -534,12 +458,9 @@ PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_PACKAGES += \
     libqti-perfd-client
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
-
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power-service.xiaomi-sm8250-libperfmgr
+    android.hardware.power-service.xiaomi-libperfmgr
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
@@ -568,6 +489,9 @@ PRODUCT_PACKAGES += \
     android.hardware.radio.deprecated@1.0.vendor
 
 # Rootdir
+PRODUCT_PACKAGES += \
+    fstab.qcom \
+    fstab.qcom_ramdisk
 
 PRODUCT_PACKAGES += \
     init.class_main.sh \
@@ -592,23 +516,14 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.sensors@1.0-impl-xiaomi \
     android.hardware.sensors@1.0-service \
-    android.hardware.sensors@2.0 \
-    android.hardware.sensors@2.1 \
-    android.frameworks.sensorservice@1.0 \
-    android.frameworks.sensorservice@1.0.vendor \
     libsensorndkbridge \
-    sensors.xiaomi
+    sensors.xiaomi`
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
-PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.accelerometer.xml \
-    frameworks/native/data/etc/android.hardware.sensor.compass.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.compass.xml \
-    frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.gyroscope.xml \
-    frameworks/native/data/etc/android.hardware.sensor.light.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.light.xml \
-    frameworks/native/data/etc/android.hardware.sensor.proximity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.proximity.xml \
-    frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepcounter.xml \
+# Shipping API level
+PRODUCT_SHIPPING_API_LEVEL := 30
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
@@ -642,16 +557,6 @@ PRODUCT_PACKAGES += \
     android.hardware.thermal@2.0-service.qti
 endif
 
-PRODUCT_VENDOR_PROPERTIES += \
-    vendor.sys.thermal.data.path=/data/vendor/thermal/
-
-# Shipping API level
-PRODUCT_SHIPPING_API_LEVEL := 30
-
-# Touch
-PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.xiaomi
-
 # USB
 PRODUCT_PACKAGES += \
     android.hardware.usb@1.3-service-qti
@@ -671,16 +576,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/vibrator/excluded-input-devices.xml:$(TARGET_COPY_OUT_VENDOR)/etc/excluded-input-devices.xml
 
-# Vibrator Xiaomi
-PRODUCT_PACKAGES += \
-    android.hardware.vibrator-V1-ndk.vendor \
-    android.hardware.vibrator-V1-ndk_platform.vendor
-
-# VNDK
-PRODUCT_COPY_FILES += \
-    prebuilts/vndk/v32/arm64/arch-arm-armv8-a/shared/vndk-sp/libutils.so:$(TARGET_COPY_OUT_VENDOR)/lib/libutils-v32.so \
-    prebuilts/vndk/v32/arm64/arch-arm64-armv8-a/shared/vndk-sp/libutils.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libutils-v32.so
-
 # Wi-Fi
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service \
@@ -698,6 +593,13 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/WCNSS_qcom_cfg.ini \
     $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf
+
+# Wi-Fi Display
+PRODUCT_PACKAGES += \
+    libnl \
+    libwfdaac_vendor
+PRODUCT_BOOT_JARS += \
+    WfdCommon
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/psyche/psyche-vendor.mk)

@@ -31,15 +31,15 @@ DEXPREOPT_GENERATE_APEX_IMAGE := true
 
 # Architecture
 TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-2a
+TARGET_ARCH_VARIANT := armv8-2a-dotprod
 TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_ABI2 :=
-TARGET_CPU_VARIANT := kryo385
+TARGET_CPU_VARIANT := cortex-a76
+
 TARGET_2ND_ARCH := arm
 TARGET_2ND_ARCH_VARIANT := armv8-2a
 TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
-TARGET_2ND_CPU_VARIANT := kryo385
+TARGET_2ND_CPU_VARIANT := cortex-a76
 # Assert
 TARGET_OTA_ASSERT_DEVICE := psyche
 
@@ -103,13 +103,11 @@ HWUI_COMPILE_FOR_PERF := true
 
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
-    $(DEVICE_PATH)/configs/hidl/device_framework_matrix.xml \
-    $(DEVICE_PATH)/configs/hidl/xiaomi_framework_compatibility_matrix.xml \
+    $(DEVICE_PATH)/configs/hidl/device_framework_matrix.xml \ 
     vendor/superior/config/device_framework_matrix.xml
 
 DEVICE_MATRIX_FILE += $(DEVICE_PATH)/configs/hidl/compatibility_matrix.xml
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/configs/hidl/manifest.xml
-DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/configs/hidl/xiaomi_manifest.xml
 
 ODM_MANIFEST_SKUS += nfc
 ODM_MANIFEST_NFC_FILES := $(DEVICE_PATH)/configs/hidl/manifest_nfc.xml
@@ -145,8 +143,7 @@ KERNEL_LD := LD=ld.lld
 KERNEL_LLVM_SUPPORT := true
 
 # Kernel Config
-TARGET_KERNEL_CONFIG := vendor/kona-perf_defconfig vendor/xiaomi/sm8250-common.config
-TARGET_KERNEL_CONFIG += vendor/xiaomi/psyche.config
+TARGET_KERNEL_CONFIG += psyche_defconfig
 
 TARGET_KERNEL_SOURCE := kernel/xiaomi/void-aosp-sm8250
 

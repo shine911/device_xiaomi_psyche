@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import /vendor/etc/init/init.batterysecret.rc
-import /vendor/etc/init/init.batteryd.rc
-
 on init
     # fingerprint
     chmod 0664 /dev/fortsense_fp
@@ -14,14 +11,6 @@ on init
     chmod 0666 /dev/goodix_fp
     chown system system /dev/goodix_fp
 
-on post-fs-data
-    # fingerprint
-    mkdir /data/vendor/fortsense 0770 system system
-    mkdir /data/vendor/fpc 0770 system system
-    mkdir /data/vendor/fpdump 0770 system system
-    mkdir /data/vendor/goodix 0770 system system
-    mkdir /mnt/vendor/persist/fpc 0770 system system
-    mkdir /mnt/vendor/persist/goodix 0770 system system
 on boot
     # fingerprint
     chown system system /sys/bus/platform/devices/soc:fingerprint_fpc/irq
@@ -59,16 +48,16 @@ on boot
     chown system system /sys/devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1/disp_param
     chmod 0660 /sys/devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1/disp_param
 
-    # Allow system to modify exposure dim layer state
+# Allow system to modify exposure dim layer state
     chown system system /sys/devices/platform/soc/soc:qcom,dsi-display-primary/dimlayer_exposure
     chmod 0660 /sys/devices/platform/soc/soc:qcom,dsi-display-primary/dimlayer_exposure
 
 on post-fs-data
+    # fingerprint
     mkdir /data/vendor/fortsense 0770 system system
     mkdir /data/vendor/fpc 0770 system system
     mkdir /data/vendor/fpdump 0770 system system
     mkdir /data/vendor/goodix 0770 system system
-
     mkdir /mnt/vendor/persist/fpc 0770 system system
     mkdir /mnt/vendor/persist/goodix 0770 system system
 
@@ -117,6 +106,25 @@ service vendor.imsrcsservice /vendor/bin/imsrcsd
     group radio vendor_qti_diag log inet wakelock
     disabled
 
-# Touch
-on boot
-    chown system system /sys/devices/virtual/touch/touch_dev/bump_sample_rate
+# IRQs
+on property:vendor.post_boot.parsed=1
+    # IRQ Tuning
+    # IRQ 70: msm_drm0
+    # IRQ 222: kgsl_3d0_irq
+    write /proc/irq/70/smp_affinity_list 2
+    write /proc/irq/222/smp_affinity_list 1
+
+    # CPUFreq
+    write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us 20000
+    write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us 10000
+    write /sys/devices/system/cpu/cpu7/cpufreq/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpu7/cpufreq/schedutil/down_rate_limit_us 5000
+
+    # CPUSets
+    setprop dalvik.vm.dex2oat-cpu-set 0,1,2,3,4,5,6
+    setprop dalvik.vm.dex2oat-threads 6
+
+    # Enable suspend to RAM
+    write /sys/power/mem_sleep "deep"
