@@ -17,9 +17,6 @@ $(call inherit-product, vendor/superior/config/common.mk)
 # Inherit from psyche device
 $(call inherit-product, device/xiaomi/psyche/device.mk)
 
-# Dolby
-TARGET_USES_MIUI_DOLBY := true
-
 # UDFPS animations
 EXTRA_UDFPS_ANIMATIONS := true
 TARGET_HAS_UDFPS := true
