@@ -98,24 +98,18 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/config.fs
 TARGET_USES_FOD_ZPOS := true
 TARGET_SURFACEFLINGER_UDFPS_LIB := //hardware/xiaomi:libudfps_extension.xiaomi
 
-# HWUI
-HWUI_COMPILE_FOR_PERF := true
-
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
-    $(DEVICE_PATH)/configs/hidl/device_framework_matrix.xml \ 
+    $(DEVICE_PATH)/configs/hidl/device_framework_matrix.xml \
     vendor/superior/config/device_framework_matrix.xml
-
 DEVICE_MATRIX_FILE += $(DEVICE_PATH)/configs/hidl/compatibility_matrix.xml
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/configs/hidl/manifest.xml
 
+# HWUI
+HWUI_COMPILE_FOR_PERF := true
+
 ODM_MANIFEST_SKUS += nfc
 ODM_MANIFEST_NFC_FILES := $(DEVICE_PATH)/configs/hidl/manifest_nfc.xml
-
-ifeq ($(TARGET_USES_MIUI_DOLBY),true)
-DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
-     $(DEVICE_PATH)/dolby/manifests/dolby_framework_matrix.xml
-endif
 
 # Init
 TARGET_INIT_VENDOR_LIB ?= //$(DEVICE_PATH):init_xiaomi_psyche
