@@ -4,7 +4,7 @@
      SPDX-License-Identifier: BSD-3-Clause
 -->
 <compatibility-matrix version="2.0" type="framework">
-<hal format="hidl" optional="true">
+    <hal format="hidl" optional="true">
         <name>android.hardware.biometrics.fingerprint</name>
         <version>2.0-3</version>
         <interface>
@@ -12,15 +12,16 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- lineage -->
+    <!-- Fingerprint -->
     <hal format="hidl" optional="true">
-        <name>vendor.lineage.livedisplay</name>
-        <version>2.0</version>
+        <name>vendor.goodix.hardware.biometrics.fingerprint</name>
+        <version>2.0-1</version>
         <interface>
-	    <name>IPictureAdjustment</name>
+            <name>IGoodixFingerprintDaemon</name>
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- lineage -->
     <hal format="hidl" optional="true">
         <name>android.hardware.bluetooth.audio</name>
         <version>2.0-1</version>
@@ -535,6 +536,40 @@
         <version>1.0</version>
         <interface>
             <name>IMotor</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.xiaomi.hardware.citsensorservice</name>
+        <transport>hwbinder</transport>
+        <version>1.1</version>
+        <interface>
+            <name>ICitSensorService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="true">
+        <name>vendor.xiaomi.hardware.fingerprintextension</name>
+        <version>1.0</version>
+        <interface>
+            <name>IXiaomiFingerprint</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="true">
+        <name>vendor.xiaomi.hardware.fx.tunnel</name>
+        <version>1.0</version>
+        <interface>
+            <name>IMiFxTunnel</name>
+            <instance>default</instance>
+        </interface>
+        <fqname>@1.0::IMiFxTunnel/default</fqname>
+    </hal>
+    <hal format="hidl" optional="true">
+        <name>vendor.xiaomi.hardware.touchfeature</name>
+        <version>1.0</version>
+        <interface>
+            <name>ITouchFeature</name>
             <instance>default</instance>
         </interface>
     </hal>
