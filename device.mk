@@ -299,6 +299,8 @@ PRODUCT_PACKAGES += \
     libtinyxml \
     libvulkan \
     vendor.display.config@1.5 \
+    vendor.display.config@1.9 \
+    vendor.display.config@1.9.vendor \
     vendor.display.config@1.11.vendor \
     vendor.display.config@2.0 \
     vendor.display.config@2.0.vendor \
@@ -306,6 +308,9 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.display.mapper@2.0.vendor \
     vendor.qti.hardware.display.mapper@3.0.vendor \
     vendor.qti.hardware.display.mapper@4.0.vendor
+
+# Display HDR
+TARGET_HAS_HDR_DISPLAY := true
 
 # Advanced_sf_offsets configuration 
 PRODUCT_COPY_FILES += \
@@ -409,11 +414,6 @@ PRODUCT_PACKAGES += \
 # Lights
 PRODUCT_PACKAGES += \
     android.hardware.light-service.xiaomi
-
-# LiveDisplay
-PRODUCT_PACKAGES += \
-    vendor.lineage.livedisplay@2.0-service-sdm \
-    vendor.lineage.livedisplay@2.1-service.xiaomi_kona
 
 # Media
 PRODUCT_PACKAGES += \
@@ -597,7 +597,7 @@ PRODUCT_PACKAGES += \
     android.frameworks.sensorservice@1.0 \
     android.frameworks.sensorservice@1.0.vendor \
     libsensorndkbridge \
-    sensors.udfps
+    sensors.xiaomi
 
 PRODUCT_PACKAGES += \
     libsensorndkbridge
@@ -642,6 +642,9 @@ PRODUCT_BOOT_JARS += \
 # Thermal
 PRODUCT_PACKAGES += \
     android.hardware.thermal@2.0-service.qti
+
+PRODUCT_VENDOR_PROPERTIES += \
+    vendor.sys.thermal.data.path=/data/vendor/thermal/
 
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 30
@@ -696,9 +699,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/WCNSS_qcom_cfg.ini \
     $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf
-
-# XiaomiPush & HuaweiAppMarket
-$(call inherit-product, vendor/addons/xiaomi/apps/config.mk)
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/psyche/psyche-vendor.mk)

@@ -544,15 +544,12 @@
         <item>107</item>
     </integer-array>
 
-    <!-- How long it takes for the HW to start illuminating after the illumination is requested. -->
-    <integer name="config_udfps_illumination_transition_ms">0</integer>
-
     <!-- If true, the screen can be rotated via the accelerometer in all 4
          rotations as the default behavior. -->
     <bool name="config_allowAllRotations">true</bool>
 
     <!-- Whether devices suports in-display fingerprint when screen is off -->
-    <bool name="config_supportsScreenOffUdfps">true</bool>
+    <bool name="config_supportScreenOffUdfps">true</bool>
 
     <!-- Type of the udfps long press sensor. Empty if long press is not supported. -->
     <string name="config_dozeUdfpsLongPressSensorType" translatable="false">org.lineageos.sensor.udfps</string>
@@ -673,7 +670,7 @@
     <!-- Screen brightness used to dim the screen while dozing in a very low power state.
          May be less than the minimum allowed brightness setting
          that can be set by the user. -->
-    <integer name="config_screenBrightnessDoze">35</integer>
+    <integer name="config_screenBrightnessDoze">12</integer>
 
      <!-- Allow automatic adjusting of the screen brightness while dozing in low power state. -->
     <bool name="config_allowAutoBrightnessWhileDozing">true</bool>
@@ -760,6 +757,8 @@
     </string-array>
 
    <string-array name="config_deviceDisabledComponents" translatable="false">
+      <item>com.google.android.gms/com.google.android.gms.nearby.discovery.service.DiscoveryService</item>
+      <item>com.google.android.gms/com.google.android.gms.nearby.messages.service.NearbyMessagesService</item>
       <item>com.google.android.gms/.chimera.GmsIntentOperationService$PersistentTrustedReceiver</item>
       <item>com.google.android.gms/.stats.service.DropBoxEntryAddedReceiver</item>
    </string-array>
