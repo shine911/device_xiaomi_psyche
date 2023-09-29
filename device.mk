@@ -183,14 +183,7 @@ PRODUCT_PACKAGES += \
 
 # Bluetooth Library Deps
 PRODUCT_PACKAGES += \
-    libbluetooth_audio_session \
-    libbthost_if.vendor \
-    libldacBT_bco \
-    libldacBT_bco.vendor \
-    liblhdc \
-    liblhdcBT_enc \
-    liblhdcdec \
-    liblhdcBT_dec
+    libbluetooth_audio_session
 
 # Camera
 PRODUCT_PACKAGES += \
@@ -695,7 +688,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf
 
 # XiaomiPush & HuaweiAppMarket
-$(call inherit-product, vendor/addons/xiaomi/apps/config.mk)
+# $(call inherit-product, vendor/addons/xiaomi/apps/config.mk)
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/psyche/psyche-vendor.mk)
